@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block base %}
+<h1>Uploaded Videos</h1>
+
+{% if videos %}
+    {% for video in videos %}
+    <div class="video-container" style="margin-bottom: 30px;">
+        <h2>{{ video.title }}</h2>
+        <p>{{ video.description }}</p>
+        
+        <!-- Video Player -->
+        <video id="video-{{ forloop.counter }}" width="640" height="360" autoplay>
+            <source src="{{ video.media_file.url }}" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        
+        <!-- Controls -->
+        <div class="controls" style="margin: 5px 0;">
+            <button onclick="togglePlay({{ forloop.counter }})">Play/Pause</button>
+            <span id="timer-{{ forloop.counter }}">0:00 / 0:00</span>
+        </div>
+        
+        <!-- Claim Button -->
+         <a href="/videos">
+        <button id="claim-btn-{{ forloop.counter }}" disabled>
+            Next
+        </button></a>
+
+        <!-- Home Button -->
+        <a href="/"><button>Home</button></a>
+
+        <!-- Display user's points balance -->
+        <p>Points Balance: {{ points_balance }}</p>
+    </div>
+    {% endfor %}
+{% else %}
+    <p>No videos uploaded yet.</p>
+{% endif %}
+{% if messages %}
+  <ul>
+    {% for message in messages %}
+      <li style="color: green;">{{ message }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+<script>
+function formatTime(seconds) {
+    const min = Math.floor(seconds / 60);
+    const sec = Math.floor(seconds % 60);
+    return `${min}:${sec.toString().padStart(2,'0')}`;
+}
+
+function togglePlay(counter) {
+    const video = document.getElementById(`video-${counter}`);
+    if(video.paused) {
+        video.play();
+    } else {
+        video.pause();
+    }
+}
+
+{% for video in videos %}
+const video{{ forloop.counter }} = document.getElementById('video-{{ forloop.counter }}');
+const timer{{ forloop.counter }} = document.getElementById('timer-{{ forloop.counter }}');
+const btn{{ forloop.counter }} = document.getElementById('claim-btn-{{ forloop.counter }}');
+
+// Update timer
+video{{ forloop.counter }}.addEventListener('timeupdate', () => {
+    timer{{ forloop.counter }}.textContent = `${formatTime(video{{ forloop.counter }}.currentTime)} / ${formatTime(video{{ forloop.counter }}.duration)}`;
+});
+
+// Enable button and notify server when video ends
+video{{ forloop.counter }}.addEventListener('ended', () => {
+    btn{{ forloop.counter }}.disabled = false;
+
+    fetch("{% url 'video_completed' video.id %}", {
+        method: "POST",
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}'
+        }
+    })
+    .then(response => response.json())
+    .then(data => console.log(data.message));
+});
+{% endfor %}
+</script>
+{% endblock base %}

@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block base %}
+
+<br>
+<main
+    style="background-color:#FFFFFF; padding:40px 30px; border-radius:12px; box-shadow:0 6px 20px rgba(0,0,0,0.1); width:100%; max-width:400px; margin:0 auto; text-align:center;">
+    <h2 style="color:#A8D0E6; margin-bottom:15px;">Welcome back!</h2>
+    <p style="color:#666666; margin-bottom:25px;">Sign in to continue watching and earning.</p>
+    {% if messages %}
+    {% for message in messages %}
+    <p style="color:red;">{{ message }}</p>
+    {% endfor %}
+    {% endif %}
+    <form method="post" action="{% url 'login' %}" style="display:flex; flex-direction:column; align-items:center;">
+        {% csrf_token %}
+        <!-- Username -->
+        <label for="email" style="align-self:flex-start; margin-bottom:8px; font-weight:bold; color:#333333;">Username</label>
+        <input type="text" id="email" name="email" placeholder="Enter your username" required
+            style="width:100%; padding:10px 12px; margin-bottom:20px; border:1px solid #ccc; border-radius:6px; font-size:1rem; box-sizing:border-box;">
+
+        <!-- Password -->
+        <label for="password"
+            style="align-self:flex-start; margin-bottom:8px; font-weight:bold; color:#333333;">Password</label>
+        <div style="position:relative; width:100%; margin-bottom:20px;">
+            <input type="password" id="password" name="password" placeholder="Enter your password" required
+                style="width:100%; padding:10px 12px; border:1px solid #ccc; border-radius:6px; font-size:1rem; box-sizing:border-box;">
+            <span style="position:absolute; right:12px; top:50%; transform:translateY(-50%); cursor:pointer;">👁</span>
+        </div>
+
+
+
+
+
+        <!-- Sign In Button -->
+        <button type="submit"
+            style="width:100%; background-color:#A8D0E6; color:#FFFFFF; padding:12px; border:none; border-radius:6px; font-size:1rem; cursor:pointer; transition:background-color 0.3s;">
+            Sign In
+        </button>
+
+        <!-- Sign Up Link -->
+        <p style="margin-top:20px; font-size:0.9rem; color:#666666;">
+            New User? <a href="/signup" style="color:#A8D0E6; text-decoration:none;">Sign Up</a>
+        </p>
+    </form>
+</main>
+
+{% endblock base %}

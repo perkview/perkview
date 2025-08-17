@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block base %}
+<!-- Hero Section -->
+<section style="background-color:#FFFFFF; padding:80px 15px; text-align:center; margin-top:15px; border-radius:12px; max-width:1200px; margin-left:auto; margin-right:auto;">
+    <h1 style="font-size:2.5rem; color:#333333; margin-bottom:20px;">Start Watching and Earning Today!</h1>
+    <p style="font-size:1.2rem; color:#666666; margin-bottom:30px;">Explore our library and earn rewards while enjoying your favorite videos.</p>
+    <a href="/videos">
+        <button style="background-color:#A8D0E6; color:#FFFFFF; border:none; padding:12px 25px; font-size:1rem; border-radius:10px; cursor:pointer;">Watch Now</button>
+    </a>
+</section>
+
+<!-- Clickable Div -->
+<div onclick="location.href='/videos'" 
+    style="cursor:pointer; background-color:#FFFFFF; padding:30px; margin:30px auto; max-width:1200px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.05); text-align:center; transition: transform 0.2s ease;">
+    <h2 style="color:#333333; margin-bottom:15px;">Explore Trending Videos</h2>
+    <p style="color:#666666; margin-bottom:20px;">Discover exciting content and earn rewards while watching!</p>
+    <a href="/videos" style="text-decoration:none;">
+        <button style="background-color:#A8D0E6; color:#FFFFFF; border:none; padding:10px 20px; border-radius:8px; cursor:pointer;">Watch Now</button>
+    </a>
+</div>
+
+{% endblock base %}

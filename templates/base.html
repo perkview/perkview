@@ -1,0 +1,157 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6306793037512374"
+        crossorigin="anonymous"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PerkView</title>
+    <link rel="icon" href="{% static 'images/favicon.png' %}" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* Mobile menu hidden by default */
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .hamburger {
+            display: none;
+            font-size: 24px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: #333;
+        }
+
+        /* Mobile styles */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                background-color: #FFFFFF;
+                position: absolute;
+                top: 70px;
+                right: 15px;
+                width: 200px;
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+                padding: 15px;
+                border-radius: 8px;
+            }
+
+            .nav-links.show {
+                display: flex;
+            }
+
+            .hamburger {
+                display: block;
+            }
+        }
+    </style>
+</head>
+
+<body style="margin:0; font-family:Arial, sans-serif; background-color:#F0F4F8; color:#333333;">
+
+    <!-- Header -->
+    <header style="background-color:#FFFFFF; padding:15px 0; box-shadow: 0 2px 6px rgba(0,0,0,0.05); position:relative;">
+        <div
+            style="max-width:1200px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; padding:0 15px; position:relative;">
+            <a href="/">
+            <div class="logo">
+                <img src="{% static 'images/logo.png' %}" alt="Brand Logo" style="height:50px;">
+            </div>
+            </a>
+            <!-- Hamburger icon for mobile -->
+            <button class="hamburger" onclick="toggleMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <!-- Navigation Links -->
+            <nav class="nav-links">
+                <a href="/" style="text-decoration:none; color: #666666;">Home</a>
+                <a href="/videos" style="text-decoration:none; color:#666666;">Videos</a>
+                <a href="/upload" style="text-decoration:none; color:#666666;">Upload Video</a>
+            </nav>
+
+            <div style="display:flex; align-items:center; gap:10px;">
+                {% if user.is_anonymous %}
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <a href="/login">
+                        <button
+                            style="background-color:#A8D0E6; color:#FFFFFF; border:none; padding:8px 15px; border-radius:8px; cursor:pointer;">
+                            Login / Sign Up
+                        </button>
+                    </a>
+                </div>
+                {% else %}
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <a href="/profile" style="text-decoration:none; color:#333333; font-weight:bold;">
+                        Welcome, {{ user.username }}!
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    {% block base %}{% endblock base %}
+
+    <!-- Footer -->
+    <footer style="background-color:#FFFFFF; padding:40px 15px; margin-top:40px;">
+        <div style="max-width:1200px; margin:0 auto; display:flex; flex-wrap:wrap; gap:40px;">
+            <!-- Quick Links -->
+            <div style="flex:1 1 200px;">
+                <h3 style="color:#333333; margin-bottom:20px;">Quick Links</h3>
+                <ul style="list-style:none; padding:0; margin:0;">
+                    <li style="margin-bottom:12px;"><a href="/about" style="color:#666666; text-decoration:none;">About Us</a></li>
+                    <li style="margin-bottom:12px;"><a href="/contact" style="color:#666666; text-decoration:none;">Contact</a></li>
+                    <li style="margin-bottom:12px;"><a href="/faqs" style="color:#666666; text-decoration:none;">FAQs</a></li>
+                    <li style="margin-bottom:12px;"><a href="/policy" style="color:#666666; text-decoration:none;">Privacy Policy</a></li>
+                    <li style="margin-bottom:12px;"><a href="/terms" style="color:#666666; text-decoration:none;">Terms of Service</a></li>
+                </ul>
+            </div>
+
+            <!-- Newsletter -->
+            <div style="flex:1 1 300px;">
+                <h3 style="color:#333333; margin-bottom:10px;">Subscribe</h3>
+                <p style="color:#666666; margin-bottom:15px;">Get updates and exclusive rewards delivered to your inbox.</p>
+                <form id="subscribe-form" method="POST" action="{% url 'subscribe_newsletter' %}"
+                    style="display:flex; gap:10px; flex-wrap:wrap;">
+                    {% csrf_token %}
+                    <input type="email" name="email" id="subscribe-email" placeholder="Enter your email" required
+                        style="flex:1; padding:10px; border-radius:8px; border:1px solid #ccc;">
+                    <button type="submit"
+                        style="background-color:#A8D0E6; color:#FFFFFF; border:none; padding:10px 20px; border-radius:8px; cursor:pointer;">
+                        Subscribe
+                    </button>
+                </form>
+
+                {% if messages %}
+                <div style="margin-top:10px;">
+                    {% for message in messages %}
+                    <p style="color: {% if message.tags == 'success' %}#28A745{% else %}#FF4500{% endif %};">
+                        {{ message }}
+                    </p>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        <div style="margin-top:30px; border-top:1px solid #ccc; padding-top:20px; text-align:center;">
+            <p style="color:#666666;">&copy; <span id="year"></span> PerkView. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        function toggleMenu() {
+            document.querySelector('.nav-links').classList.toggle('show');
+        }
+        document.getElementById("year").textContent = new Date().getFullYear();
+    </script>
+
+</body>
+</html>

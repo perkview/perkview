@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block base %}
+
+
+<main id="main-content"
+    style="font-family:Arial, sans-serif; color:#333333; background-color:#F0F4F8; padding:40px 15px;">
+
+    <!-- Contact Us Introduction Section -->
+    <section
+        style="max-width:800px; margin:0 auto 40px auto; text-align:center; background-color:#FFFFFF; padding:30px; border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.05);">
+        <h2 style="color:#333333; font-size:2rem; margin-bottom:15px;">We'd Love to Hear From You</h2>
+        <p style="color:#666666; font-size:1rem;">If you have any questions, need help, or want to share your feedback,
+            feel free to reach out to us.</p>
+    </section>
+
+    <!-- Contact Form Section -->
+    <section
+        style="max-width:800px; margin:0 auto 30px auto; background-color:#FFFFFF; padding:30px; border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.05);">
+        <h2 style="color:#333333; font-size:1.8rem; margin-bottom:20px; text-align:center;">Contact Us</h2>
+
+        <form method="POST" enctype="multipart/form-data" novalidate
+      action="{% url 'contact' %}"
+      style="display:flex; flex-direction:column; gap:18px; background-color:#FFFFFF; padding:25px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.05); max-width:600px; margin:auto;">
+    {% csrf_token %}
+
+    <!-- Name Field -->
+    <label for="name" style="font-weight:bold; color:#333333;">Your Name*</label>
+    <input type="text" id="name" name="name" placeholder="Enter your name" required
+           style="padding:12px; border-radius:10px; border:1px solid #ccc; background-color:#F0F4F8; color:#333333; font-size:1rem;">
+
+    <!-- Email Field -->
+    <label for="email" style="font-weight:bold; color:#333333;">Your Email Address*</label>
+    <input type="email" id="email" name="email" placeholder="Enter your email" required
+           style="padding:12px; border-radius:10px; border:1px solid #ccc; background-color:#F0F4F8; color:#333333; font-size:1rem;">
+
+    <!-- Subject Field -->
+    <label for="subject" style="font-weight:bold; color:#333333;">Subject</label>
+    <select id="subject" name="subject"
+            style="padding:12px; border-radius:10px; border:1px solid #ccc; background-color:#F0F4F8; color:#333333; font-size:1rem;">
+        <option value="general">General Inquiry</option>
+        <option value="support">Technical Support</option>
+        <option value="partnership">Partnership</option>
+    </select>
+
+    <!-- Message Field -->
+    <label for="message" style="font-weight:bold; color:#333333;">Your Message*</label>
+    <textarea id="message" name="message" rows="5" placeholder="Type your message here..." required
+              style="padding:12px; border-radius:10px; border:1px solid #ccc; background-color:#F0F4F8; color:#333333; font-size:1rem;"></textarea>
+
+    <!-- File Upload -->
+    <label for="file" style="font-weight:bold; color:#333333;">Attach a File (Optional)</label>
+    <input type="file" id="file" name="file" accept=".jpg, .png, .pdf"
+           style="padding:10px; border-radius:10px; border:1px solid #ccc; background-color:#F0F4F8; font-size:1rem;">
+
+    <!-- CAPTCHA -->
+    <label for="captcha" style="font-weight:bold; color:#333333;">What is 2 + 2?*</label>
+    <input type="text" id="captcha" name="captcha" placeholder="Enter your answer" required
+           style="padding:12px; border-radius:10px; border:1px solid #ccc; background-color:#F0F4F8; color:#333333; font-size:1rem;">
+
+    <!-- Submit Button -->
+    <button type="submit"
+            style="background-color:#A8D0E6; color:#FFFFFF; border:none; padding:12px 25px; border-radius:12px; font-size:1rem; cursor:pointer; transition:all 0.3s ease;">
+        Send Message
+    </button>
+
+    <!-- Response Messages -->
+    {% if messages %}
+        <div style="margin-top:10px;">
+            {% for message in messages %}
+                <p style="color: {% if message.tags == 'success' %}#CFFFE5{% else %}#FFAAA5{% endif %}; font-weight:bold;">
+                    {{ message }}
+                </p>
+            {% endfor %}
+        </div>
+    {% endif %}
+</form>
+
+
+    </section>
+
+    <!-- Response Note -->
+    <div
+        style="max-width:800px; margin:0 auto; text-align:center; background-color:#FFFFFF; padding:15px; border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.05);">
+        <p style="color:#666666;">We aim to respond within 24 hours. Thank you for reaching out!</p>
+    </div>
+
+</main>
+
+
+{% endblock base %}

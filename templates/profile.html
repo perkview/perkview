@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block base %}
+<main
+    style="background-color:#F0F4F8; padding:40px 30px; border-radius:12px; max-width:600px; margin:0 auto; font-family:sans-serif; color:#333333;">
+    <!-- Greeting -->
+    <h2 style="color:#A8D0E6; text-align:center; margin-bottom:25px;">Welcome, {{ full_name }}!</h2>
+
+    <!-- Profile Info -->
+    <div
+        style="background-color:#FFFFFF; padding:20px; border-radius:10px; box-shadow:0 4px 12px rgba(0,0,0,0.05); margin-bottom:20px;">
+        <p><strong>Username:</strong> <span id="profile-username">{{ username }}</span></p>
+        <p><strong>Email Address:</strong> <span id="profile-email">{{ email }}</span></p>
+        <p><strong>Points Balance:</strong> <span id="profile-points">{{ points_balance }}</span></p>
+        <p><strong>Balance:</strong> <span id="profile-balance">{{ usd_balance }}PKR</span></p>
+        <p><strong>Referral Code:</strong> <span id="profile-referral">{{ referral_code }} (Share your referral code to others to get a bonus)</span></p>
+        <a href="/logout">
+            <p><span style="color: red;">Logout</span></p>
+        </a>
+        {% if notifications %}
+        <div style="padding:15px; margin-bottom:20px; background-color:#DFF0D8; border-radius:8px; color:#3C763D;">
+            <h4>Notifications:</h4>
+            <ul>
+                {% for note in notifications %}
+                <li>{{ note }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+
+    </div>
+
+    <!-- Wallet Section -->
+    <div
+        style="background-color:#FFFFFF; padding:20px; border-radius:12px; box-shadow:0 6px 20px rgba(0,0,0,0.08); margin-bottom:20px; text-align:center; transition:transform 0.3s, box-shadow 0.3s;">
+        <a href="/wallet">
+            <button
+                style="background-color:#A8D0E6; color:#FFFFFF; padding:12px 25px; border:none; border-radius:8px; font-size:1rem; cursor:pointer; transition:background-color 0.3s;">
+                Wallet
+            </button>
+        </a>
+
+
+    </div>
+
+
+    <!-- User Activity Feed -->
+    <div
+        style="background-color:#FFFFFF; padding:20px; border-radius:10px; box-shadow:0 4px 12px rgba(0,0,0,0.05); margin-bottom:20px;">
+        <h3 style="color:#A8D0E6; margin-bottom:15px;">User Activity Feed</h3>
+
+        {% if user_videos %}
+        <p><strong>Videos Uploaded:</strong></p>
+        <ul>
+            {% for video in user_videos %}
+            <li style="margin-bottom:10px;">
+                <a href="{{ video.media_file.url }}" target="_blank" style="color:#007BFF; text-decoration:underline;">
+                    {{ video.title }}
+                </a>
+                <span style="color:#666666; font-size:0.9rem;">(Uploaded on {{ video.uploaded_at|date:"M d, Y H:i"}})</span>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p style="color:#666666; font-style:italic;">No videos uploaded yet.</p>
+        {% endif %}
+    </div>
+
+</main>
+
+
+{% endblock base %}

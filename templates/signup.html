@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block base %}
+
+<br>
+
+<main
+    style="background-color:#FFFFFF; padding:40px 30px; border-radius:12px; box-shadow:0 6px 20px rgba(0,0,0,0.1); width:100%; max-width:400px; margin:0 auto; text-align:center;">
+    <h2 style="color:#A8D0E6; margin-bottom:15px;">Sign Up</h2>
+    <p style="color:#666666; margin-bottom:25px;">Create your account and start earning rewards!</p>
+
+        {% if messages %}
+    {% for message in messages %}
+    <div style="color: red; text-align: center;">{{ message }}</div>
+    {% endfor %}
+    {% endif %}
+    <form action="{% url 'signup' %}" method="post" style="display:flex; flex-direction:column; align-items:center;">
+        {% csrf_token %}
+        <!-- Full Name -->
+        <label for="fullname" style="align-self:flex-start; margin-bottom:8px; font-weight:bold; color:#333333;">Full
+            Name</label>
+        <input type="text" id="fullname" name="fullname" placeholder="Enter your full name" required
+            style="width:100%; padding:10px 12px; margin-bottom:20px; border:1px solid #ccc; border-radius:6px; font-size:1rem; box-sizing:border-box;">
+
+        <!-- Email Address -->
+        <label for="email" style="align-self:flex-start; margin-bottom:8px; font-weight:bold; color:#333333;">Email
+            Address</label>
+        <input type="email" id="email" name="email" placeholder="Enter your email address" required
+            style="width:100%; padding:10px 12px; margin-bottom:20px; border:1px solid #ccc; border-radius:6px; font-size:1rem; box-sizing:border-box;">
+
+        <!-- Password -->
+        <label for="password"
+            style="align-self:flex-start; margin-bottom:8px; font-weight:bold; color:#333333;">Password</label>
+        <input type="password" id="password" name="password" placeholder="Minimum 8 characters, at least one uppercase"
+            required
+            style="width:100%; padding:10px 12px; margin-bottom:20px; border:1px solid #ccc; border-radius:6px; font-size:1rem; box-sizing:border-box;">
+
+        <!-- Confirm Password -->
+        <label for="confirm_password"
+            style="align-self:flex-start; margin-bottom:8px; font-weight:bold; color:#333333;">Confirm Password</label>
+        <input type="password" id="confirm_password" name="confirm_password" placeholder="Re-enter your password"
+            required
+            style="width:100%; padding:10px 12px; margin-bottom:20px; border:1px solid #ccc; border-radius:6px; font-size:1rem; box-sizing:border-box;">
+
+        <!-- Username -->
+        <label for="username"
+            style="align-self:flex-start; margin-bottom:8px; font-weight:bold; color:#333333;">Username</label>
+        <input type="text" id="username" name="username" placeholder="Your unique display name" required
+            style="width:100%; padding:10px 12px; margin-bottom:20px; border:1px solid #ccc; border-radius:6px; font-size:1rem; box-sizing:border-box;">
+
+        <!-- Referral Code -->
+        <label for="referral_code"
+            style="align-self:flex-start; margin-bottom:8px; font-weight:bold; color:#333333;">Referral Code
+            (Optional)</label>
+        <input type="text" id="referral_code" name="referral_code" placeholder="Enter referral code if you have one"
+            style="width:100%; padding:10px 12px; margin-bottom:20px; border:1px solid #ccc; border-radius:6px; font-size:1rem; box-sizing:border-box;">
+
+
+        <!-- Terms Agreement -->
+        <label
+            style="display:flex; align-items:center; margin-bottom:20px; font-size:0.9rem; color:#666666; width:100%;">
+            <input type="checkbox" name="terms" required style="margin-right:8px;"> I agree to the <a href="terms.html"
+                style="color:#A8D0E6; text-decoration:none;">Terms of Service</a> and <a href="policy.html"
+                style="color:#A8D0E6; text-decoration:none;">Privacy Policy</a>
+        </label>
+
+        <!-- Sign Up Button -->
+        <button type="submit"
+            style="width:100%; background-color:#A8D0E6; color:#FFFFFF; padding:12px; border:none; border-radius:6px; font-size:1rem; cursor:pointer; transition:background-color 0.3s;">
+            Sign Up
+        </button>
+    </form>
+        {% if messages %}
+    {% for message in messages %}
+    <div style="color: red; text-align: center;">{{ message }}</div>
+    {% endfor %}
+    {% endif %}
+</main>
+
+
+{% endblock base %}

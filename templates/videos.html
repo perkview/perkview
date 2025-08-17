@@ -28,7 +28,7 @@
                height="360" 
                autoplay
                style="border-radius:12px; background-color:#F0F4F8;">
-            <source src="{% static random_video %}" type="video/mp4">
+            <source src="{% static 'random_video' %}" type="video/mp4">
             Your browser does not support the video tag.
         </video>
 
@@ -158,3 +158,4 @@ nextButton.addEventListener('click', () => {
 
 
 {% endblock %}
+

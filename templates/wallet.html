@@ -46,74 +46,84 @@
         <h3 style="color:#A8D0E6; margin-bottom:15px;">Funds Transfer</h3>
         <p style="color:#666666; font-size:0.9rem;">Transfer Funds to Easypaisa Account</p>
 
-        <!-- Transfer Form -->
-        <form action="{% url 'wallet' %}" method="POST"
-            style="display:flex; flex-direction:column; gap:20px; max-width:500px; margin:auto; background-color:#FFFFFF; padding:25px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.05);">
-            {% csrf_token %}
+<!-- Transfer Form -->
+<form action="{% url 'wallet' %}" method="POST"
+      style="display:flex; flex-direction:column; gap:20px; max-width:500px; margin:auto; background-color:#FFFFFF; padding:25px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.05);">
+    {% csrf_token %}
 
-            <h2 style="color:#333333; margin-bottom:15px;">Request Withdrawal</h2>
+    <h2 style="color:#333333; margin-bottom:15px;">Request Withdrawal</h2>
 
-            <!-- Auto-filled Username -->
-            <label style="font-weight:bold; color:#333333;">Username</label>
-            <input type="text" name="username" value="{{ request.user.username }}" readonly
-                style="padding:12px; border-radius:8px; border:1px solid #ccc; background-color:#F0F4F8; color:#333333; font-size:1rem;">
+    <!-- Auto-filled Username -->
+    <label style="font-weight:bold; color:#333333;">Username</label>
+    <input type="text" name="username" value="{{ request.user.username }}" readonly
+           style="padding:12px; border-radius:8px; border:1px solid #ccc; background-color:#F0F4F8; color:#333333; font-size:1rem;">
 
-            <!-- Auto-filled Email -->
-            <label style="font-weight:bold; color:#333333;">Email</label>
-            <input type="email" name="email" value="{{ request.user.email }}" readonly
-                style="padding:12px; border-radius:8px; border:1px solid #ccc; background-color:#F0F4F8; color:#333333; font-size:1rem;">
+    <!-- Auto-filled Email -->
+    <label style="font-weight:bold; color:#333333;">Email</label>
+    <input type="email" name="email" value="{{ request.user.email }}" readonly
+           style="padding:12px; border-radius:8px; border:1px solid:#ccc; background-color:#F0F4F8; color:#333333; font-size:1rem;">
 
-            <!-- Amount -->
-            <label style="font-weight:bold; color:#333333;">Amount (PKR)</label>
-            <input type="number" name="amount" step="0.01" min="10" placeholder="Enter amount to withdraw" required
-                style="padding:12px; border-radius:8px; border:1px solid #ccc; background-color:#F0F4F8; color:#333333; font-size:1rem;">
+    <!-- Withdrawal Amount -->
+    <label style="font-weight:bold; color:#333333;">Amount (PKR)</label>
+    <input type="number" name="amount" step="0.01" min="10" placeholder="Enter amount to withdraw" required
+           style="padding:12px; border-radius:8px; border:1px solid:#ccc; background-color:#F0F4F8; color:#333333; font-size:1rem;">
 
-            <!-- Payment Method -->
-            <label style="font-weight:bold; color:#333333;">Payment Method</label>
-            <select name="method" required
-                style="padding:12px; border-radius:8px; border:1px solid #ccc; background-color:#F0F4F8; color:#333333; font-size:1rem;">
-                <option value="">Select Method</option>
-                <option value="EasyPaisa">EasyPaisa</option>
-                <option value="Other">Other (Request New Option)</option>
-            </select>
+    <!-- Payment Method -->
+    <label style="font-weight:bold; color:#333333;">Payment Method</label>
+    <select name="method" required
+            style="padding:12px; border-radius:8px; border:1px solid:#ccc; background-color:#F0F4F8; color:#333333; font-size:1rem;">
+        <option value="">Select Method</option>
+        <option value="EasyPaisa">EasyPaisa</option>
+        <option value="Other">Other (Request New Option)</option>
+    </select>
 
-            <!-- Account Number / Mobile -->
-            <label style="font-weight:bold; color:#333333;">Account Number / Mobile Number</label>
-            <input type="text" name="account_details" placeholder="Enter your account number or mobile" required
-                style="padding:12px; border-radius:8px; border:1px solid #ccc; background-color:#F0F4F8; color:#333333; font-size:1rem;">
-            <!-- Informational Notes -->
-            <p style="color:#666666; font-size:0.95rem; margin-top:10px;">
-                Your payment request will be approved within <strong>24 hours</strong>. You will be notified on this
-                email.
-            </p>
-            <p style="color:#666666; font-size:0.95rem;">
-                You can also ask for other funds transfer options via <a href="/contact"
-                    style="color:#A8D0E6; text-decoration:none;">Contact Us</a> (e.g., buying game bundles, mobile
-                top-ups, etc.).
-            </p>
-<button type="submit" name="withdraw"
-    style="background-color:#A8D0E6; color:#FFFFFF; border:none; padding:12px; border-radius:8px; font-size:1rem; font-weight:bold; cursor:pointer; transition:all 0.2s ease-in-out;"
-    onmouseover="this.style.backgroundColor='#96c3e0'; this.style.transform='scale(1.05)';"
-    onmouseout="this.style.backgroundColor='#A8D0E6'; this.style.transform='scale(1)';">
-    Submit Withdrawal
-</button>
+    <!-- Account Holder Name -->
+    <label style="font-weight:bold; color:#333333;">Account Holder Name</label>
+    <input type="text" name="account_holder_name" placeholder="Enter the name as per bank/EasyPaisa account" required
+           style="padding:12px; border-radius:8px; border:1px solid:#ccc; background-color:#F0F4F8; color:#333333; font-size:1rem;">
 
+    <!-- Account Number / Mobile -->
+    <label style="font-weight:bold; color:#333333;">Account Number / Mobile Number</label>
+    <input type="text" name="account_details" placeholder="Enter your account number or mobile" required
+           style="padding:12px; border-radius:8px; border:1px solid:#ccc; background-color:#F0F4F8; color:#333333; font-size:1rem;">
 
+    <!-- Important Note -->
+    <p style="color:#a00; font-size:0.95rem; margin-top:5px; font-weight:bold;">
+        ⚠️ Payment will only proceed if the entered <strong>Account Holder Name</strong> matches the name registered on the bank/EasyPaisa account.
+    </p>
 
-            <!-- Notifications / Messages -->
-            {% if messages %}
-            <div>
-                {% for message in messages %}
-                <div style="padding:10px; margin-bottom:10px; border-radius:8px; 
-                            {% if message.tags == 'error' %} background:#ffdddd; color:#a00; 
-                            {% elif message.tags == 'success' %} background:#ddffdd; color:#070; 
-                            {% endif %}">
-                    {{ message }}
-                </div>
-                {% endfor %}
-            </div>
-            {% endif %}
-        </form>
+    <!-- Informational Notes -->
+    <p style="color:#666666; font-size:0.95rem; margin-top:10px;">
+        Your payment request will be approved within <strong>24 hours</strong>. You will be notified on this email.
+    </p>
+    <p style="color:#666666; font-size:0.95rem;">
+        You can also ask for other funds transfer options via 
+        <a href="/contact" style="color:#A8D0E6; text-decoration:none;">Contact Us</a>
+        (e.g., buying game bundles, mobile top-ups, etc.).
+    </p>
+
+    <!-- Submit Button -->
+    <button type="submit" name="withdraw"
+        style="background-color:#A8D0E6; color:#FFFFFF; border:none; padding:12px; border-radius:8px; font-size:1rem; font-weight:bold; cursor:pointer; transition:all 0.2s ease-in-out;"
+        onmouseover="this.style.backgroundColor='#96c3e0'; this.style.transform='scale(1.05)';"
+        onmouseout="this.style.backgroundColor='#A8D0E6'; this.style.transform='scale(1)';">
+        Submit Withdrawal
+    </button>
+
+    <!-- Notifications / Messages -->
+    {% if messages %}
+    <div>
+        {% for message in messages %}
+        <div style="padding:10px; margin-bottom:10px; border-radius:8px; 
+                    {% if message.tags == 'error' %} background:#ffdddd; color:#a00; 
+                    {% elif message.tags == 'success' %} background:#ddffdd; color:#070; 
+                    {% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</form>
 
 
 

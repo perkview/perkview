@@ -10,6 +10,10 @@ from django.http import JsonResponse
 from django.db.models import F
 from django.contrib.auth.decorators import login_required
 import random
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.utils import timezone
+from .models import Withdrawal  # make sure these models exist
 
 
 # Create your views here.
@@ -20,15 +24,15 @@ def index(request):
 def videos(request):
     """Display a random video with user's points (if logged in)"""
     
-    # Get user points if logged in
+    # 1️⃣ Get user points if logged in
     if request.user.is_authenticated:
         profile = request.user.profile
-        points_balance = profile.points_balance
+        points_balance = profile.points_balance or 0
     else:
         profile = None
         points_balance = 0
 
-    # List of your static video files
+    # 2️⃣ List of your static video files
     video_files = [
         'videos/1.mp4',
         'videos/2.mp4',
@@ -37,67 +41,62 @@ def videos(request):
         'videos/5.mp4',
     ]
     
-    # Choose one random video
+    # 3️⃣ Choose one random static video
     random_video = random.choice(video_files)
 
+    # 4️⃣ Choose one uploaded video (or None if no videos exist)
+    uploaded_video = MediaUpload.objects.first()  # only one video
+
     context = {
-        "random_video": random_video,
+        "video": uploaded_video,        # single video object
+        "random_video": random_video,   # static video path
         "points_balance": points_balance,
         "profile": profile,
     }
     
     return render(request, 'videos.html', context)
 
+
 @csrf_exempt
 def video_completed(request, video_id):
-    """Grant points to viewer and creator when video ends"""
-    
-    # Only logged-in users earn points
     if not request.user.is_authenticated:
         return JsonResponse({"message": "❌ You must log in to earn points"}, status=403)
 
-    if request.method == "POST":
-        # Get the video
-        video = get_object_or_404(MediaUpload, id=video_id)
+    if request.method != "POST":
+        return JsonResponse({"message": "❌ Invalid request"}, status=400)
 
-        # ----------------------------
-        # 1. Grant points to viewer
-        # ----------------------------
-        viewer_profile = request.user.profile
-        viewer_profile.points_balance = F('points_balance') + 2  # add 2 points
-        viewer_profile.save()
-        viewer_profile.refresh_from_db()  # fetch updated balance
+    video = get_object_or_404(MediaUpload, id=video_id)
 
-        viewer_profile.add_notification(
-            f"✅ You earned 2 points for watching '{video.title}' uploaded by {video.username}."
+    # 1️⃣ Award points to viewer
+    viewer_profile, _ = Profile.objects.get_or_create(
+        user=request.user, defaults={'points_balance': 0}
+    )
+    viewer_profile.points_balance = F('points_balance') + 2
+    viewer_profile.save()
+    viewer_profile.refresh_from_db()
+    viewer_profile.add_notification(
+        f"✅ You earned 2 points for watching '{video.title}' uploaded by {video.username}."
+    )
+
+    # 2️⃣ Award points to video creator
+    try:
+        creator_user = User.objects.get(username=video.username)
+        creator_profile, _ = Profile.objects.get_or_create(
+            user=creator_user, defaults={'points_balance': 0}
         )
-        viewer_profile.save()
+        creator_profile.points_balance = F('points_balance') + 1
+        creator_profile.save()
+        creator_profile.refresh_from_db()
+        creator_profile.add_notification(
+            f"🎉 You earned 1 point because your video '{video.title}' was watched by {request.user.username}."
+        )
+    except User.DoesNotExist:
+        pass
 
-        # ----------------------------
-        # 2. Grant points to creator
-        # ----------------------------
-        try:
-            creator_user = User.objects.get(username=video.username)
-            creator_profile, _ = Profile.objects.get_or_create(user=creator_user)
-            creator_profile.points_balance = F('points_balance') + 1  # add 1 point
-            creator_profile.save()
-            creator_profile.refresh_from_db()  # fetch updated balance
+    return JsonResponse({
+        "message": f"✅ You earned 2 points! Your new balance: {viewer_profile.points_balance}"
+    })
 
-            creator_profile.add_notification(
-                f"🎉 You earned 1 point because your video '{video.title}' was watched by {request.user.username}."
-            )
-            creator_profile.save()
-        except User.DoesNotExist:
-            # Creator user not found; skip
-            pass
-
-        # Return JSON with updated viewer balance
-        return JsonResponse({
-            "message": f"✅ You earned 2 points! Your new balance: {viewer_profile.points_balance}"
-        })
-
-    # Invalid request method
-    return JsonResponse({"message": "❌ Invalid request"}, status=400)
 
 
 def upload(request):
@@ -297,15 +296,17 @@ def profile(request):
 
 
 
+
+
 def wallet(request):
     if request.user.is_anonymous:
         return redirect('/login')
 
     profile = request.user.profile
 
-    # Split notifications into a list
+    # ================== HANDLE NOTIFICATIONS ==================
     notifications = profile.notifications.splitlines() if profile.notifications else []
-    profile.notifications = ""  # clear notifications
+    profile.notifications = ""  # clear after loading
     profile.save()
 
     context = {
@@ -320,8 +321,10 @@ def wallet(request):
         "referred_by": profile.referred_by,
     }
 
+    # ================== HANDLE POST ==================
     if request.method == "POST":
-        # ================== WITHDRAW ==================
+
+        # ---------- WITHDRAW ----------
         if "withdraw" in request.POST:
             try:
                 amount = float(request.POST.get('amount'))
@@ -332,12 +335,12 @@ def wallet(request):
             method = request.POST.get('method')
             account_details = request.POST.get('account_details')
 
-            # Minimum withdrawal check
+            # ✅ Minimum withdrawal
             if amount < 25:
                 messages.warning(request, "⚠️ Minimum withdrawal amount is $25.")
                 return redirect('wallet')
 
-            # ✅ Check entered amount vs available balance
+            # ✅ Check balance
             if amount > profile.usd_balance:
                 messages.error(
                     request,
@@ -345,18 +348,21 @@ def wallet(request):
                 )
                 return redirect('wallet')
 
-            # Check if at least 5 videos uploaded in last 7 days
+            # ✅ Must upload at least 5 videos in last 7 days
+            one_week_ago = timezone.now() - timezone.timedelta(days=7)
+            recent_uploads = MediaUpload.objects.filter(
+                uploaded_by=request.user,
+                uploaded_at__gte=one_week_ago
+            ).count()
 
 
-
-
-            # ✅ Do not deduct balance, just create request
+            # ✅ Create withdrawal request (do not deduct yet)
             Withdrawal.objects.create(
                 user=request.user,
                 amount=amount,
                 method=method,
                 account_details=account_details,
-                status="Pending"  # always pending until admin processes
+                status="Pending"  # always pending
             )
 
             messages.success(
@@ -365,7 +371,7 @@ def wallet(request):
             )
             return redirect('wallet')
 
-        # ================== CONVERT POINTS ==================
+        # ---------- CONVERT POINTS ----------
         elif "convert" in request.POST:
             try:
                 points = int(request.POST.get('points'))
@@ -380,7 +386,7 @@ def wallet(request):
                 messages.error(request, "⚠️ You don’t have enough points to convert.")
                 return redirect('wallet')
 
-            # Deduct points, add USD
+            # ✅ Deduct points, add USD
             profile.points_balance -= points
             profile.usd_balance += usd_amount
             profile.save()
@@ -392,6 +398,7 @@ def wallet(request):
             return redirect('wallet')
 
     return render(request, 'wallet.html', context)
+
 
 
 

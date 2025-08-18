@@ -88,13 +88,26 @@ class MediaUpload(models.Model):
     def __str__(self):
         return f"{self.title} by {self.username}"
     
+from django.db import models
+from django.contrib.auth.models import User
+from django.utils import timezone
+
+
 class Withdrawal(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="withdrawals")
     amount = models.DecimalField(max_digits=10, decimal_places=2)
-    method = models.CharField(max_length=50)  # EasyPaisa, JazzCash, Other
+    method = models.CharField(max_length=50)  # e.g., EasyPaisa, JazzCash, Bank Transfer
     account_details = models.CharField(max_length=100)
-    status = models.CharField(max_length=20, default='Pending')
+    status = models.CharField(
+        max_length=20,
+        choices=[
+            ("Pending", "Pending"),
+            ("Approved", "Approved"),
+            ("Rejected", "Rejected"),
+        ],
+        default="Pending",
+    )
     requested_at = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
-        return f"{self.user.username} - {self.amount} - {self.status}"
+        return f"{self.user.username} - ${self.amount} - {self.status}"

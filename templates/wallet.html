@@ -26,7 +26,7 @@
         <span id="wallet-points">{{ points_balance }}</span> Points &nbsp;
         <span id="wallet-pkr">{{ usd_balance }}</span> PKR
     </p>
-    <p style="font-size:0.9rem; color:#666666;">Each 100 points equals 1 PKR</p>
+    <p style="font-size:0.9rem; color:#666666;">Each 100 points equals 5 PKR</p>
 
     <button
         style="background-color:#007BFF; color:#FFFFFF; padding:10px 20px; border:none; border-radius:8px; font-size:1rem; cursor:pointer; transition:background-color 0.3s, transform 0.3s;"
@@ -129,7 +129,6 @@
 
     </div>
 </main>
-
 <script>
 function convertPoints() {
     let pointsElem = document.getElementById("wallet-points");
@@ -140,12 +139,14 @@ function convertPoints() {
     let pkr = parseInt(pkrElem.innerText);
 
     if (points < 100) {
+        messageElem.style.color = "#FF4500";
         messageElem.innerText = "❌ Insufficient points. You need at least 100 points to convert.";
         return;
     }
 
-    // Convert
-    let convertPKR = Math.floor(points / 100); // 100 points = 1 PKR
+    // Conversion logic: 100 points = 5 PKR
+    let convertPKR = Math.floor(points / 100) * 5;
+    let convertedPoints = Math.floor(points / 100) * 100; // total points actually converted
     let remainingPoints = points % 100;
 
     // Update UI
@@ -153,7 +154,7 @@ function convertPoints() {
     pkrElem.innerText = pkr + convertPKR;
 
     messageElem.style.color = "#28A745";
-    messageElem.innerText = `✅ Successfully converted PKR{points - remainingPoints} points into PKR{convertPKR} PKR.`;
+    messageElem.innerText = `✅ Successfully converted ${convertedPoints} points into ${convertPKR} PKR.`;
 
     // Send update to backend
     fetch("/convert_points/", {
@@ -163,7 +164,7 @@ function convertPoints() {
             "X-CSRFToken": getCookie("csrftoken") // Django CSRF protection
         },
         body: JSON.stringify({
-            converted_points: points - remainingPoints,
+            converted_points: convertedPoints,
             added_pkr: convertPKR
         })
     })
@@ -197,6 +198,7 @@ function getCookie(name) {
     return cookieValue;
 }
 </script>
+
 
 
 {% endblock base %}

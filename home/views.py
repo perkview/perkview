@@ -337,14 +337,14 @@ def wallet(request):
 
             # ✅ Minimum withdrawal
             if amount < 25:
-                messages.warning(request, "⚠️ Minimum withdrawal amount is $25.")
+                messages.warning(request, "⚠️ Minimum withdrawal amount is $PKR 25.")
                 return redirect('wallet')
 
             # ✅ Check balance
             if amount > profile.usd_balance:
                 messages.error(
                     request,
-                    f"❌ Withdrawal failed! You only have ${profile.usd_balance:.2f} available."
+                    f"❌ Withdrawal failed! You only have PKR {profile.usd_balance:.2f} available."
                 )
                 return redirect('wallet')
 
@@ -380,7 +380,7 @@ def wallet(request):
                 return redirect('wallet')
 
             conversion_rate = 0.01  # 100 points = $1
-            usd_amount = points * conversion_rate
+            usd_amount = (points * conversion_rate) * 5
 
             if points > profile.points_balance:
                 messages.error(request, "⚠️ You don’t have enough points to convert.")
@@ -409,7 +409,7 @@ def convert_points(request):
         if profile.points_balance >= 100:
             pkrs = profile.points_balance // 100
             profile.points_balance -= pkrs * 100
-            profile.usd_balance += pkrs
+            profile.usd_balance += (pkrs) * 5
             profile.save()
             return JsonResponse({
                 "success": True,
